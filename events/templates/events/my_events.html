@@ -1,0 +1,65 @@
+{% extends 'events/base.html' %}
+{% load static %}{% load events_extras %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <header class="dashboard-welcome">
+        <h1><i class="fas fa-user"></i> Welcome, {{ user.username }}!</h1>
+        <p>Here's your event registration dashboard.</p>
+    </header>
+
+    {% for message in messages %}
+    {% if message.tags == 'success' %}
+    <div class="dashboard-success-banner success-banner">
+        <i class="fas fa-check-circle"></i>
+        <span>{{ message }}</span>
+        <button type="button" class="banner-close" aria-label="Close">&times;</button>
+    </div>
+    {% endif %}
+    {% endfor %}
+
+    <section class="dashboard-section">
+        <h2 class="dashboard-section-title"><i class="fas fa-calendar-check"></i> Your Registered Events</h2>
+        <div class="dashboard-cards">
+            {% for reg in registrations %}
+            <article class="dashboard-event-card glass">
+                <div class="dashboard-card-image">
+                    {% if reg.event.image %}
+                    <img src="{{ reg.event.image.url }}" alt="{{ reg.event.title }}">
+                    {% else %}
+                    <div class="event-image-placeholder event-{{ reg.event.category|lower }}" style="background-image: url('https://images.unsplash.com/photo-{% if reg.event.category == 'Technical' %}1516321318423-f06f85e504b3{% elif reg.event.category == 'Cultural' %}1492684223066-81342ee5ff30{% elif reg.event.category == 'Workshop' %}1522202176988-66273c2fd55f{% else %}1571019613454-1cb3431a4392{% endif %}?w=400&h=250&fit=crop&auto=format'); background-size: cover; background-position: center;">
+                        <div class="event-image-overlay">
+                            <i class="fas fa-{% if reg.event.category == 'Technical' %}laptop-code{% elif reg.event.category == 'Cultural' %}music{% elif reg.event.category == 'Workshop' %}tools{% else %}futbol{% endif %}"></i>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="dashboard-card-body">
+                    <h3><a href="{% url 'events:event_detail' reg.event.pk %}">{{ reg.event.title }}</a></h3>
+                    <p><i class="fas fa-building"></i> {{ reg.event.college.name }}</p>
+                    <p><i class="fas fa-calendar"></i> {{ reg.event.date|date:"F d, Y" }}</p>
+                    <p><i class="fas fa-clock"></i> {{ reg.event.time|time:"g:i A" }}</p>
+                    <p><i class="fas fa-map-marker-alt"></i> {{ reg.event.venue }}</p>
+                    <p><i class="fas fa-ticket-alt"></i> Entry Fee: ₹{{ reg.event.entry_fee }}</p>
+                    <p class="registered-on"><i class="fas fa-calendar-check"></i> Registered on: {{ reg.registered_at|date:"F d, Y" }}</p>
+                    <div class="dashboard-card-actions">
+                        <a href="{% url 'events:event_review' reg.event.pk %}" class="btn btn-primary btn-sm">Write review</a>
+                        <a href="{% url 'events:event_detail' reg.event.pk %}" class="btn btn-outline btn-sm">View details</a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <p class="empty-msg">You haven't registered for any events yet. <a href="{% url 'events:home' %}#events">Browse events</a></p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+<script>
+(function() {
+  var banner = document.querySelector('.dashboard-success-banner');
+  var closeBtn = document.querySelector('.banner-close');
+  if (banner && closeBtn) closeBtn.addEventListener('click', function() { banner.remove(); });
+})();
+</script>
+{% endblock %}

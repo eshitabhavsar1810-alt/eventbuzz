@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EventBuzz{% endblock %} | College Event Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'events/css/style.css' %}?v=2.0">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Animated Background Elements -->
+    <div class="animated-bg">
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape-3"></div>
+        <div class="floating-shape shape-4"></div>
+        <div class="floating-shape shape-5"></div>
+        <div class="particle particle-1"></div>
+        <div class="particle particle-2"></div>
+        <div class="particle particle-3"></div>
+        <div class="particle particle-4"></div>
+        <div class="particle particle-5"></div>
+    </div>
+    
+    <nav class="navbar navbar-gradient">
+        <a href="{% url 'events:home' %}" class="nav-brand">
+            <i class="fas fa-calendar-alt"></i> EventBuzz
+        </a>
+        <button class="nav-toggle" aria-label="Menu"><i class="fas fa-bars"></i></button>
+        <ul class="nav-links">
+            <li><a href="{% url 'events:home' %}" class="nav-link-home"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="{% url 'events:events' %}" class="nav-link-events"><i class="fas fa-calendar-day"></i> Events</a></li>
+            <li><a href="{% url 'events:colleges' %}" class="nav-link-colleges"><i class="fas fa-university"></i> Colleges</a></li>
+            <li><a href="{% url 'events:contact' %}" class="nav-link-contact"><i class="fas fa-envelope"></i> Contact</a></li>
+            <li><a href="{% url 'events:admin_login' %}" class="nav-link-admin"><i class="fas fa-shield-alt"></i> Admin</a></li>
+            {% if user.is_authenticated %}
+                <li class="nav-user-wrap">
+                    <button class="nav-user-btn" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user"></i> {{ user.username }} <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <ul class="nav-user-dropdown">
+                        {% if user.is_staff %}
+                        <li><a href="{% url 'events:admin_dashboard' %}"><i class="fas fa-shield-alt"></i> Admin Dashboard</a></li>
+                        <li><a href="{% url 'events:admin_registrations' %}"><i class="fas fa-users"></i> Registrations</a></li>
+                        <li><a href="{% url 'events:admin_logout' %}"><i class="fas fa-sign-out-alt"></i> Admin Logout</a></li>
+                        <li class="dropdown-divider"></li>
+                        {% endif %}
+                        {% if not user.is_staff %}
+                        <li><a href="{% url 'events:my_events' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        {% endif %}
+                        <li><a href="{% url 'events:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </li>
+            {% else %}
+                <li><a href="{% url 'events:login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                <li><a href="{% url 'events:register' %}" class="btn-nav"><i class="fas fa-user-plus"></i> Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {% if message.tags == 'success' %}<i class="fas fa-check-circle"></i>{% endif %}
+            {{ message }}
+            <button class="alert-close">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-col">
+                <h4>About EventBuzz</h4>
+                <p>Your one-stop college event platform. Discover technical fests, workshops, cultural events & sports. Register, connect, and have fun!</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="{% url 'events:home' %}">Home</a></li>
+                    <li><a href="{% url 'events:events' %}">Events</a></li>
+                    <li><a href="{% url 'events:colleges' %}">Colleges</a></li>
+                    <li><a href="{% url 'events:register' %}">Register</a></li>
+                    <li><a href="{% url 'events:about' %}">About</a></li>
+                    <li><a href="{% url 'events:contact' %}">Contact</a></li>
+                    <li><a href="{% url 'events:admin_login' %}">Admin Panel</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contact Us</h4>
+                <p><i class="fas fa-envelope"></i> eventbuzz@example.com</p>
+                <p><i class="fas fa-phone"></i> +1 234 567 890</p>
+                <p><i class="fas fa-map-marker-alt"></i> College Road, Campus</p>
+            </div>
+            <div class="footer-col">
+                <h4>Newsletter</h4>
+                <p>Stay updated with upcoming events.</p>
+                <form class="footer-newsletter" onsubmit="return false;">
+                    <input type="email" placeholder="Your email" aria-label="Email">
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; {% now "Y" %} EventBuzz. College Event Management Platform.</p>
+        </div>
+    </footer>
+
+    <script src="{% static 'events/js/main.js' %}"></script>
+    <script src="{% static 'events/js/animations.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

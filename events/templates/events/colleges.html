@@ -1,0 +1,35 @@
+{% extends 'events/base.html' %}
+{% load static %}
+{% block title %}Colleges{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="page-hero-inner">
+        <h1><i class="fas fa-university"></i> Our Partner Colleges</h1>
+        <p>Discover amazing colleges hosting exciting events</p>
+    </div>
+</section>
+
+<section class="colleges section" id="colleges">
+    <div class="section-inner">
+        <h2 class="section-title"><i class="fas fa-university"></i> Colleges</h2>
+        <div class="college-grid" id="collegeGrid">
+            {% for college in colleges %}
+            <a href="{% url 'events:events' %}?college={{ college.id }}" class="college-card glass" data-college-id="{{ college.id }}">
+                {% if college.logo %}
+                <img src="{{ college.logo.url }}" alt="{{ college.name }}" class="college-logo">
+                {% else %}
+                <div class="college-logo-placeholder">{{ college.name|slice:":2" }}</div>
+                {% endif %}
+                <h3>{{ college.name }}</h3>
+                <p>{{ college.location|default:"—" }}</p>
+            </a>
+            {% empty %}
+            <p class="empty-msg">
+                No colleges yet. <strong>Load sample data:</strong> run <code>python manage.py seed_events</code> in your terminal, or add colleges in the <a href="{% url 'admin:index' %}">Admin panel</a>.
+            </p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'events/base.html' %}
+{% block title %}Delete Event{% endblock %}
+
+{% block content %}
+<div class="form-page">
+  <div class="form-card glass">
+    <h1>Delete Event</h1>
+    <p class="form-meta">You are about to delete <strong>{{ event.title }}</strong>.</p>
+    <p>This cannot be undone.</p>
+    <form method="post" class="styled-form" style="display:flex; gap:0.75rem; align-items:center; margin-top:1.25rem;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary btn-animated">Confirm delete</button>
+      <a class="btn btn-outline" href="{% url 'events:admin_dashboard' %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

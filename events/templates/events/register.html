@@ -1,0 +1,46 @@
+{% extends 'events/base.html' %}
+{% load static %}
+{% block title %}Register for {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="form-card glass">
+        <h1>Register for <em>{{ event.title }}</em></h1>
+        <p class="form-meta">{{ event.date }} · {{ event.venue }}</p>
+        <form method="post" class="styled-form" id="registerForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Full name *</label>
+                <input type="text" name="full_name" value="{{ form.full_name.value|default:user.get_full_name }}" placeholder="Your full name" required minlength="2">
+                {% if form.full_name.errors %}<span class="form-error">{{ form.full_name.errors.0 }}</span>{% endif %}
+            </div>
+            <div class="form-group">
+                <label>Date of birth *</label>
+                <input type="date" name="date_of_birth" value="{{ form.date_of_birth.value|default:'' }}" required>
+                {% if form.date_of_birth.errors %}<span class="form-error">{{ form.date_of_birth.errors.0 }}</span>{% endif %}
+            </div>
+            <div class="form-group">
+                <label>Email *</label>
+                <input type="email" name="email" value="{{ form.email.value|default:user.email }}" placeholder="Your email address" required>
+                {% if form.email.errors %}<span class="form-error">{{ form.email.errors.0 }}</span>{% endif %}
+            </div>
+            <div class="form-group">
+                <label>Contact number *</label>
+                <input type="text" name="contact_number" value="{{ form.contact_number.value|default:'' }}" placeholder="10+ digit number" required minlength="10">
+                {% if form.contact_number.errors %}<span class="form-error">{{ form.contact_number.errors.0 }}</span>{% endif %}
+            </div>
+            <div class="form-group">
+                <label>College name *</label>
+                <input type="text" name="college_name" value="{{ form.college_name.value|default:user.username }}" placeholder="Your college name" required minlength="2">
+                {% if form.college_name.errors %}<span class="form-error">{{ form.college_name.errors.0 }}</span>{% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary btn-animated">Confirm registration</button>
+        </form>
+    </div>
+</div>
+<script>
+document.getElementById('registerForm').addEventListener('submit', function() {
+    sessionStorage.setItem('registrationSuccess', 'true');
+});
+</script>
+{% endblock %}

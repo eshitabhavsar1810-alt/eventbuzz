@@ -1,0 +1,56 @@
+{% extends 'events/base.html' %}
+{% load static %}
+{% block title %}Review – {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="review-page">
+    <div class="review-header glass">
+        <h1>Review: <a href="{% url 'events:event_detail' event.pk %}">{{ event.title }}</a></h1>
+        <p class="avg-rating-display">Average rating: <span id="avgRatingDisplay">★ {{ avg_rating }}</span></p>
+    </div>
+
+    <div class="review-form-card glass">
+        <h2>{% if user_review %}Edit your review{% else %}Write a review{% endif %}</h2>
+        <form method="post" class="styled-form" id="reviewForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Rating</label>
+                <div class="star-rating" id="starRating" data-rating="{{ user_review.rating|default:0 }}">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+                <input type="hidden" name="rating" id="ratingInput" value="{{ user_review.rating|default:'' }}" required>
+                <span class="form-error"></span>
+            </div>
+            <div class="form-group">
+                <label>Feedback (optional)</label>
+                <textarea name="feedback" rows="4" placeholder="Share your experience...">{{ user_review.feedback|default:'' }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-animated">Submit review</button>
+        </form>
+    </div>
+
+    <div class="reviews-list-card glass">
+        <h2>All reviews</h2>
+        <ul class="reviews-list" id="reviewsList">
+            {% for r in reviews %}
+            <li class="review-item">
+                <div class="review-stars">
+                    {% for i in "12345" %}
+                    <span class="star {% if forloop.counter <= r.rating %}filled{% endif %}">★</span>
+                    {% endfor %}
+                </div>
+                <p class="review-feedback">{{ r.feedback|default:"No comment" }}</p>
+                <span class="review-meta">{{ r.user.username }} · {{ r.created_at|timesince }} ago</span>
+            </li>
+            {% empty %}
+            <li class="no-reviews">No reviews yet. Be the first!</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<script src="{% static 'events/js/review.js' %}"></script>
+{% endblock %}

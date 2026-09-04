@@ -1,0 +1,88 @@
+{% extends 'events/base.html' %}
+{% load static %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+  <header class="dashboard-welcome">
+    <h1><i class="fas fa-shield-alt"></i> Admin Dashboard</h1>
+    <p>Manage events, registrations, and notifications.</p>
+  </header>
+
+  <section class="dashboard-section">
+    <div class="dashboard-cards">
+      <article class="dashboard-event-card glass">
+        <div class="dashboard-card-body">
+          <h3><i class="fas fa-plus-circle"></i> Add Event</h3>
+          <p>Create a new event and notify users.</p>
+          <a class="btn btn-primary btn-sm" href="{% url 'events:admin_event_create' %}">Create event</a>
+        </div>
+      </article>
+
+      <article class="dashboard-event-card glass">
+        <div class="dashboard-card-body">
+          <h3><i class="fas fa-users"></i> View Registrations</h3>
+          <p>Search, filter, and export registrations.</p>
+          <a class="btn btn-outline btn-sm" href="{% url 'events:admin_registrations' %}">Open registrations</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="dashboard-section">
+    <h2 class="dashboard-section-title"><i class="fas fa-calendar-day"></i> Events</h2>
+
+    <form method="get" class="styled-form" style="max-width: 900px;">
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status">
+          <option value="">All</option>
+          <option value="upcoming" {% if status == 'upcoming' %}selected{% endif %}>Upcoming</option>
+          <option value="ongoing" {% if status == 'ongoing' %}selected{% endif %}>Ongoing</option>
+          <option value="completed" {% if status == 'completed' %}selected{% endif %}>Completed</option>
+          <option value="cancelled" {% if status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Search</label>
+        <input type="text" name="q" placeholder="Search title, college, venue..." value="{{ q|default:'' }}">
+      </div>
+      <button class="btn btn-primary btn-sm" type="submit">Filter</button>
+    </form>
+
+    <div class="glass" style="padding: 1rem; margin-top: 1rem; overflow-x:auto;">
+      <table style="width:100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th style="text-align:left; padding: .6rem;">Event</th>
+            <th style="text-align:left; padding: .6rem;">College</th>
+            <th style="text-align:left; padding: .6rem;">Date/Time</th>
+            <th style="text-align:left; padding: .6rem;">Venue</th>
+            <th style="text-align:left; padding: .6rem;">Status</th>
+            <th style="text-align:left; padding: .6rem;">Regs</th>
+            <th style="text-align:left; padding: .6rem;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in events %}
+          <tr>
+            <td style="padding: .6rem;"><a href="{% url 'events:event_detail' e.pk %}">{{ e.title }}</a></td>
+            <td style="padding: .6rem;">{{ e.college.name }}</td>
+            <td style="padding: .6rem;">{{ e.date }} {{ e.time }}</td>
+            <td style="padding: .6rem;">{{ e.venue }}</td>
+            <td style="padding: .6rem;">{{ e.get_status_display }}</td>
+            <td style="padding: .6rem;">{{ e.registrations.count }}</td>
+            <td style="padding: .6rem; white-space: nowrap;">
+              <a class="btn btn-outline btn-sm" href="{% url 'events:admin_event_update' e.pk %}">Edit</a>
+              <a class="btn btn-outline btn-sm" href="{% url 'events:admin_event_delete' e.pk %}">Delete</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" style="padding: .8rem;">No events found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

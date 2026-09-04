@@ -1,0 +1,124 @@
+{% extends 'events/base.html' %}
+{% load static %}{% load events_extras %}
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="event-detail-wrapper">
+    <header class="event-banner">
+        <div class="event-banner-inner">
+            <h1>{{ event.title }}</h1>
+            <p class="event-hosted"><i class="fas fa-building"></i> Hosted by {{ event.college.name }}</p>
+        </div>
+    </header>
+
+    <div class="event-detail-layout">
+        <div class="event-detail-main">
+            <div class="event-detail-image-card glass">
+                {% if event.image %}
+                <img src="{{ event.image.url }}" alt="{{ event.title }}">
+                {% else %}
+                <div class="event-detail-placeholder event-{{ event.category|lower }}" style="background-image: url('https://images.unsplash.com/photo-{% if event.category == 'Technical' %}1516321318423-f06f85e504b3{% elif event.category == 'Cultural' %}1492684223066-81342ee5ff30{% elif event.category == 'Workshop' %}1522202176988-66273c2fd55f{% else %}1571019613454-1cb3431a4392{% endif %}?w=800&h=400&fit=crop&auto=format'); background-size: cover; background-position: center;">
+                    <div class="event-image-overlay">
+                        <i class="fas fa-{% if event.category == 'Technical' %}laptop-code{% elif event.category == 'Cultural' %}music{% elif event.category == 'Workshop' %}tools{% else %}futbol{% endif %}"></i>
+                        <span>{{ event.category }}</span>
+                    </div>
+                </div>
+                {% endif %}
+                <span class="event-tag event-tag-{{ event.date_status }}">{{ event.date_status|date_status_label }}</span>
+            </div>
+            <div class="event-description glass">
+                <h2>About this event</h2>
+                <p>{{ event.description }}</p>
+            </div>
+            <div class="event-reviews-section glass">
+                <h2>Reviews <span class="avg-rating">★ {{ avg_rating }}</span></h2>
+                <a href="{% url 'events:event_review' event.pk %}" class="btn btn-outline">Write a review</a>
+                <ul class="reviews-list">
+                    {% for r in reviews %}
+                    <li class="review-item">
+                        <div class="review-stars">{% for i in "12345" %}<span class="star {% if forloop.counter <= r.rating %}filled{% endif %}">★</span>{% endfor %}</div>
+                        <p class="review-feedback">{{ r.feedback|default:"No comment" }}</p>
+                        <span class="review-meta">{{ r.user.username }} · {{ r.created_at|timesince }} ago</span>
+                    </li>
+                    {% empty %}
+                    <li class="no-reviews">No reviews yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <aside class="event-detail-sidebar">
+            <div class="sidebar-card glass">
+                <h3><i class="fas fa-clipboard-list"></i> Registration Status</h3>
+                <p class="sidebar-reg-count"><i class="fas fa-users"></i> Registrations: {{ event.registrations.count }} / {{ event.max_participants }}</p>
+                {% if event.date_status == 'coming_soon' %}
+                    <div class="register-disabled-box">
+                        <i class="fas fa-clock"></i>
+                        <p><strong>Registration Not Open Yet</strong></p>
+                        <p class="disabled-reason">This event is coming soon. Please check back later for registration.</p>
+                    </div>
+                {% else %}
+                    {% if user.is_authenticated %}
+                        {% if user_registered %}
+                        <p class="badge-registered"><i class="fas fa-check-circle"></i> You are registered</p>
+                        {% elif event.is_expired %}
+                        <div class="register-disabled-box">
+                            <i class="fas fa-ban"></i>
+                            <p><strong>Registration Closed</strong></p>
+                            <p class="disabled-reason">This event has ended.</p>
+                        </div>
+                        {% elif event.is_full %}
+                        <div class="register-disabled-box">
+                            <i class="fas fa-users-slash"></i>
+                            <p><strong>Event Full</strong></p>
+                            <p class="disabled-reason">All {{ event.max_participants }} seats are taken.</p>
+                        </div>
+                        {% else %}
+                        <a href="{% url 'events:event_register' event.pk %}" class="btn btn-primary btn-animated btn-block btn-register-now">
+                            <i class="fas fa-calendar-plus"></i> REGISTER NOW
+                        </a>
+                        {% endif %}
+                    {% else %}
+                    <a href="{% url 'events:login' %}?next={% url 'events:event_register' event.pk %}" class="btn btn-primary btn-block">Login to register</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="sidebar-card glass">
+                <h3><i class="fas fa-map-marker-alt"></i> Venue Location</h3>
+                <p class="sidebar-venue">{{ event.venue }}</p>
+            </div>
+            <div class="sidebar-card glass sidebar-meta">
+                <p><i class="fas fa-calendar"></i> {{ event.date }}</p>
+                <p><i class="fas fa-clock"></i> {{ event.time|time:"g:i A" }}</p>
+                <p><i class="fas fa-ticket-alt"></i> Entry: ₹{{ event.entry_fee }}</p>
+                {% if not event.is_expired %}
+                <div class="countdown-wrap">
+                    <p class="countdown-label"><i class="fas fa-hourglass-half"></i> Time left to register</p>
+                    <div class="countdown" id="countdown" data-datetime="{{ event.date|date:'Y-m-d' }} {{ event.time|time:'H:i' }}">
+                        <div class="countdown-item">
+                            <span id="cd-days" class="countdown-number">0</span>
+                            <span class="countdown-unit">Days</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span id="cd-hours" class="countdown-number">0</span>
+                            <span class="countdown-unit">Hours</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span id="cd-mins" class="countdown-number">0</span>
+                            <span class="countdown-unit">Mins</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span id="cd-secs" class="countdown-number">0</span>
+                            <span class="countdown-unit">Secs</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'events/js/countdown.js' %}"></script>
+{% endblock %}

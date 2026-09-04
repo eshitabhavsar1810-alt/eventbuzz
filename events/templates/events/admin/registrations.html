@@ -1,0 +1,61 @@
+{% extends 'events/base.html' %}
+{% block title %}Registrations{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+  <header class="dashboard-welcome">
+    <h1><i class="fas fa-users"></i> Registrations</h1>
+    <p>Filter by event and search by name/email.</p>
+  </header>
+
+  <section class="dashboard-section">
+    <form method="get" class="styled-form" style="max-width: 900px;">
+      <div class="form-group">
+        <label>Event</label>
+        <select name="event">
+          <option value="">All events</option>
+          {% for e in events %}
+          <option value="{{ e.id }}" {% if event_id|stringformat:"s" == e.id|stringformat:"s" %}selected{% endif %}>
+            {{ e.title }} ({{ e.date }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Search</label>
+        <input type="text" name="q" placeholder="Username / name / email" value="{{ q|default:'' }}">
+      </div>
+      <button class="btn btn-primary btn-sm" type="submit">Apply</button>
+    </form>
+
+    <div class="glass" style="padding: 1rem; margin-top: 1rem; overflow-x:auto;">
+      <table style="width:100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th style="text-align:left; padding: .6rem;">Event</th>
+            <th style="text-align:left; padding: .6rem;">User</th>
+            <th style="text-align:left; padding: .6rem;">Email</th>
+            <th style="text-align:left; padding: .6rem;">Contact</th>
+            <th style="text-align:left; padding: .6rem;">College</th>
+            <th style="text-align:left; padding: .6rem;">Registered at</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in registrations %}
+          <tr>
+            <td style="padding: .6rem;">{{ r.event.title }}</td>
+            <td style="padding: .6rem;">{{ r.user.get_full_name|default:r.user.username }}</td>
+            <td style="padding: .6rem;">{{ r.user.email }}</td>
+            <td style="padding: .6rem;">{{ r.contact_number }}</td>
+            <td style="padding: .6rem;">{{ r.college_name }}</td>
+            <td style="padding: .6rem;">{{ r.registered_at }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" style="padding: .8rem;">No registrations found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}
